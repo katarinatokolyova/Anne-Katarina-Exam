@@ -1,0 +1,59 @@
+// List of dormitories
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Dormitories</title>
+</head>
+<body>
+  <h1>Dormitories</h1>
+  <p>
+    Please find your dormitory 
+  </p>
+
+  <form id="dormitoryForm">
+  </form>
+
+  <ul id="eventList">
+    <li>Børglum kollegiet</li>
+    <li>Christiansbjerg kollegiet</li>
+    <li>Christianshøj kollegiet</li>
+    <li>Dania kollegiet</li>
+  </ul>
+
+  <script>
+    // Select our header on the page, the H1 element
+    let pageHeader = document.querySelector('h1')
+    console.log('H1 element', pageHeader)
+    
+    // Select our list's items
+    let events = document.querySelectorAll('#eventList li')
+    console.log('All events', events)
+    
+    // Add event to our form
+    // First we select our form
+    let form = document.querySelector('#eventForm')
+    
+    // Next we add a event listener to override default behaviour
+    form.addEventListener('submit', function (event) {
+      // Make sure not to submit form like usual
+      event.preventDefault()
+      // Select out input field
+      let inputField = document.querySelector('#newEvent')
+      // Create new <li> element
+      let newListElement = document.createElement('li')
+      // Set the text of the <li> element
+      newListElement.innerHTML = inputField.value
+      // Select the list we want to add our new item to
+      let eventList = document.querySelector('#eventList')
+      // Add our element to the list
+      eventList.appendChild(newListElement)
+      // Delete content of the input field
+      inputField.value = ''
+    })
+  </script>
+</body>
+</html>
