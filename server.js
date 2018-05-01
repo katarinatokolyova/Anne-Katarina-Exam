@@ -47,7 +47,7 @@ app.get('/test', (req,res) => {
     })
 })
 
-app.get('/api/dormitories', (req,res) =>{
+app.sget('/api/dormitories', (req,res) =>{
     db.Dormitory.findAll().then(dormitories =>{
         res.json(dormitories)
     }) 

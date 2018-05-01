@@ -1,0 +1,4 @@
+#event-window, #event-participants {
+    height: inherit;
+    overflow: auto; 
+}
