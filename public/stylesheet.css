@@ -1,106 +1,84 @@
-html, body
-{
-    height: 100%;
+html,
+body {
+	height: 100%;
 }
 
-body
-{
-    margin: 0px;
-    padding: 0px;
-    background: linear-gradient(darkgrey, lightgrey);
-    font-family: "Verdana", "Geneva", "sans-serif";
-    font-size: 12pt;
-    font-weight: 300;
-    color: #444444;
+body {
+	margin: 0px;
+	padding: 0px;
+	background: linear-gradient(darkgrey, lightgrey);
+	font-family: "Verdana", "Geneva", "sans-serif";
+	font-size: 12pt;
+	font-weight: 300;
+	color: whitesmoke;
 }
 
-#eventList
-{
+#eventList {
 	background: lightgrey;
 }
 
-h1, h2
-{
-    margin: 0;
+h1,
+h2 {
+	margin: 0;
 	padding: 0;
-    font-weight: lighter;
+	font-weight: lighter;
 	color: #333;
+	position: relative;
 	text-align: center;
 }
 
-p, ul
-{
-    margin-top: 0;
+p,
+ul {
+	margin-top: 0;
 }
 
-p
-{
+p {
 	line-height: 180%;
 	text-align: center;
 }
 
-strong
-{
-}
+strong {}
 
-
-#header
-{
+#header {
 	position: relative;
 	float: center;
 	width: 300px;
-    padding: 3em 0em;
+	padding: 3em 0em;
 }
 
-#banner
-{
+#banner {
 	margin-bottom: 4em;
 }
 
-#menu
-	{
-	}
-	
-	#menu ul
-	{
-		list-style-type: none;
-		margin: 0;
-		padding: 0;
-	}
+#menu {}
 
-	
-	#menu li
-	{
-		border-top: 1px solid rgba(26, 20, 20, 0.08);
-	}
-	
-	#menu li , #menu li span
-	{
-		display: block;
-		padding: 2em 1.5em;
-		text-align: center;
-		letter-spacing: 2px;
-		text-decoration:  none;
-		text-transform: uppercase;
-		color: rgba(3, 3, 3, 0.5);
-		font-weight: lighter;
-	}
-	
+#menu ul {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+}
 
-	#main
-	{
-		overflow: hidden;
-		float: center;
-		padding: 3em 50px 5em 50px;
-		background: #FFF;
-		border-top: 6px solid #292b2c;
-		text-align: center;
-	}
+#menu li {
+	border-top: 1px solid rgba(26, 20, 20, 0.08);
+}
 
-	#eventForm
-	{
-		float: center;
-		padding: 3em 3px 3em 3px;
-		text-align: center;
-		font-weight: lighter;
-	}	
+#menu li,
+#menu li span {
+	display: block;
+	padding: 2em 1.5em;
+	text-align: center;
+	letter-spacing: 2px;
+	text-decoration: none;
+	text-transform: uppercase;
+	color: rgba(3, 3, 3, 0.863);
+	font-weight: lighter;
+}
+
+#main {
+	overflow: hidden;
+	float: center;
+	padding: 3em 50px 5em 50px;
+	background: #FFF;
+	border-top: 6px solid #292b2c;
+	text-align: center;
+}
