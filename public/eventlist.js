@@ -57,7 +57,7 @@ function DormEvent (event, dormitory) {
     this.dormitory = dormitory
 }
 
- 
+// nyt
 module.getEvents = function (dormitory) {
     // The credentials option makes sure that the browsers cookies
     // are sent back and forth during a request

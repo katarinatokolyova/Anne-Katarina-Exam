@@ -2,14 +2,33 @@ var Eventplatform = (function () {
 
 // Local array to keep track of data
 let comments = []
-let eventparticipants = []
+let guestList = []
 
 
 // Elements
 const eventWindowElement = document.querySelector('#event-window')
 const eventCommentElement = document.querySelector('#comment-window')
-const eventParticipantsElement = document.querySelector('#event-participants')
+const guestListElement = document.querySelector('#guestlist-window')
 
+// Templates
+const userTemplate = ({ username }) => `
+<li class="media my-2">
+  <div class="media-body">
+    <b class="text-secondary">${username}</b>
+  </div>
+</li>
+`
+
+const commentTemplate = ({text, user}) => `
+<div class="media my-3 chat-message">
+  <div class="media-body">
+    <div class="mt-0"><b>${user.username}</b></div>
+    <p>
+      ${text}
+    </p>
+  </div>
+</div>
+`
 
 // Private frontend module
 let frontend = {}
@@ -28,10 +47,10 @@ frontend.addComment = function (comment) {
     eventCommentElement.insertAdjacentElement('beforeend', html)
 }
 
-frontend.addParticipant = function (participant){
-    let html = participantTemplate (participant)
+frontend.addUser = function (user){
+    let html = guestListTemplate (user)
 
-    eventParticipantsElement.insertAdjacentElement('beforeend', html)
+    guestListElement.insertAdjacentElement('beforeend', html)
     frontend.autoScroll ()
 }
 
@@ -69,3 +88,15 @@ function EventComment (comment, user)
     this.user = user
     this.createdAt = new Date()
 })
+
+// Add a user to the gueslist
+frontend.addUser = function (user) {
+    let html = userTemplate(user)
+
+
+  // Set the new HTML and add it to the end of the list
+  guestListElement.insertAdjacentHTML('beforeend', html)  
+}
+
+
+

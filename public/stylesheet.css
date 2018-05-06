@@ -17,12 +17,16 @@ body {
 	background: lightgrey;
 }
 
+#dormitoryList {
+	background: lightgrey;
+}
+
 h1,
 h2 {
 	margin: 0;
 	padding: 0;
 	font-weight: lighter;
-	color: #333;
+	color: dark blue;
 	position: relative;
 	text-align: center;
 }
@@ -80,5 +84,48 @@ strong {}
 	padding: 3em 50px 5em 50px;
 	background: #FFF;
 	border-top: 6px solid #292b2c;
+	text-align: center;
+}
+
+#frontpageheadline {
+	font-family: 'Gill Sans';
+	font-size: 120px;
+	text-align: center;
+	color: white;
+	position: relative;
+	right: 40px;
+}
+
+#smalltext {
+	font-family: 'Gill Sans';
+	font-size: 20px;
+	color: white;
+}
+
+@keyframes fadeIn {
+	from { opacity: 0; margin-left: -1em; }
+	to { opacity: 1; margin-left: 0; }
+  }
+
+#guestlist-window #comment-window {
+	height: inherit;
+	overflow: auto;
+}
+
+.commentInput {
+	height: 10vh;
+}
+
+.hidden {
+	display: none;
+}
+
+#eventdescription
+{
+	margin: 0;
+	padding: 0;
+	font-weight: lighter;
+	color: dark blue;
+	position: relative;
 	text-align: center;
 }

@@ -52,7 +52,46 @@ app.get('/api/dormitories', (req, res) => {
         res.json(dormitories)
     })
 })
-// nyt
+
+// Endpoint to register a new user
+app.post('/api/users', (req, res) => {
+    let { username, password } = req.body
+
+    let schema = {
+        username: Joi.string().alphanum().required(),
+        password: Joi.string().required()
+    }
+
+    const result = Joi.validate(req.body, schema)
+
+    if (result.error !== null) {
+        return res.status(422).json({
+            status: 'ERROR',
+            message: 'Validation failed'
+        })
+    }
+
+    // Create the new user
+    db.User.create({
+        username,
+        password
+    })
+    .then(user => {
+        // HTTP 201 = Created
+        res.status(201).json({
+            status: 'OK',
+            message: 'User created!'
+        })
+    })
+    .catch(error => {
+        res.status(422).json({
+            status: 'ERROR',
+            message: 'Error creating user!'
+        })
+    })
+})
+
+// Endpoint which returns all events relevant to the dormitory
 app.get('/api/dormitories/:id/events', (req, res) => {
     let query = {
         where: {
@@ -65,6 +104,35 @@ app.get('/api/dormitories/:id/events', (req, res) => {
         res.json(events)
     })
 })
+
+// Endpoint which returns all comments relevant to the event
+app.get('/api/events/:id/comments', (req, res) => {
+    let query = {
+        where: {
+            eventId: req.params.id
+        }
+    }
+    // SELECT * FROM comments WHERE eventId = 123
+
+    db.Comment.findAll(query).then(comments => {
+        res.json(comments)
+    })
+})
+
+// Endpoint which returns all guests relevant to event
+app.get('/api/guestlist/:id/user', (req, res) => {
+    let query = {
+        where: {
+            eventId: req.params.id
+        }
+    }
+    // SELECT * FROM eventId WHERE UserId = 123
+
+    db.Comment.findAll(query).then(comments => {
+        res.json(comments)
+    })
+})
+
 
 // Main endpoint where main page is served from
 app.get('/', (req, res) => {
