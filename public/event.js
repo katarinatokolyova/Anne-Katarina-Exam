@@ -98,5 +98,92 @@ frontend.addUser = function (user) {
   guestListElement.insertAdjacentHTML('beforeend', html)  
 }
 
+//method for writing a comment
+module.sendComment = function (comment) {
+    // // The "credentials" option makes sure that the browser's cookies
+    // are sent back and forth during a request
+    // Please refer to the fetch() docs: https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
+    let options = {
+        method: 'post',
+        credentials: 'include',
+        headers: {
+            'content-type':'application/json'
+        },
+        body: JSON.stringify(comment)
+    }  
+    fetch('/api/comment', options)
+    .then(response => response.json())
+    .then(response => {
+        if (response.status != 'OK') {
+        }      
+    }) 
+} 
 
+//returns the comment array - server?
+module.getComment = function (event) {
+    // The credentials option makes sure that the browsers cookies are sent back and forth during a request
+    let options = {
+        credentials: 'include'
+    }
+    return fetch('/api/comments', options)
+    .then(response => response.json())
+}
 
+// Function which sets ip listeners for Socket.io events 
+// And loads initial comments to the commen window
+function initialize() {
+    // Setup the socket 
+    let socket = io() 
+
+// What to do when the "new comment" event is received
+socket.on('new comment', comment => {
+    // Add the message to the chat window
+    frontend.addComment(comment)
+})
+
+// Load all comments and display them
+module.getComment()
+.then(allComments => {
+    comments = allComments
+
+    frontend.displayComments(comments)
+})
+}
+
+// Run the initialize function 
+initialize()
+
+return module
+
+//Adding comment to event
+function EventComment (text) {
+    this.text = text
+}
+document.querySelector('#comment-form').addEventListener('submit', event => {
+    event.preventDefault()
+
+    let input = document.querySelector('#eventComment')
+
+    let text = input.value
+    let newCommentobject = new EventComment(text)
+
+    Comment.sendComment(newCommentobject)
+
+    input.value = ''
+})
+
+// Adding user to guestlist of event???? 
+function GuestlistElement (user) {
+    this.username = user
+}
+document.querySelector('#guestlist-form').addEventListener('submit', event => {
+    event.preventDefault()
+
+    let input = document.querySelector('#guestlist-input')
+
+    let newGuestlistobject = new GuestlistElement(text)
+
+    user.sendUser(newGuestlistobject)
+
+    input.value = ''
+})

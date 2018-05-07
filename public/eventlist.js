@@ -57,7 +57,7 @@ function DormEvent (event, dormitory) {
     this.dormitory = dormitory
 }
 
-// nyt
+// NYT returns the event array for each dormitory
 module.getEvents = function (dormitory) {
     // The credentials option makes sure that the browsers cookies
     // are sent back and forth during a request
@@ -71,3 +71,12 @@ module.getEvents = function (dormitory) {
 })
 
 // module.getEvents(DORM_ID)
+
+module.getEvents = function (DORM_ID) {
+    let options = {
+        credentials: 'include'
+    }
+
+    return fetch(`/api/dormitories/${dormitory_id}/events`, options)
+    .then(response => response.json())
+}

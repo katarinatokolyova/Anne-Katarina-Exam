@@ -53,9 +53,97 @@ app.get('/api/dormitories', (req, res) => {
     })
 })
 
+// Manually check if user is logged in - if not, redirect to login.html
+app.get('/', (req, res) => {
+    if (!req.session.user) {
+        return res.redirect('login.html')
+    }
+
+    res.sendFile(__dirname + '/public/dormitorylist.html')
+})
+
+
+// Manually check if user is registered - if not, redirect to register page - how to do this???
+
+// Endpoint to handle user authentication
+app.post('api/auth', (req, res) => {
+    let {
+        username,
+        password
+    } = req.body
+
+    // Make sure username and password are present
+    let schema = {
+        username: Joi.string().alphanum().required(),
+        password: Joi.string().required()
+    }
+
+    // Validate using Joi
+    let result = Joi.validate(req.body, schema)
+
+    // Return an error if validation failed
+    if (result.error != null) {
+        return res.status(422).json({
+            message: 'Invalid request'
+        })
+    }
+
+    // Build query for looking up the user
+    let query = {
+        where: {
+            username
+        }
+    }
+
+    db.User.findOne(query)
+        .then(user => {
+            // Return an error if user was not found
+            if (!user) {
+                return res.status(422).json({
+                    status: 'ERROR',
+                    message: 'Invalid credentials'
+
+                })
+            }
+
+            // Compare the found user's password with the submitted password
+            // bcrypt encrypts the submitted and stores the password
+            bcrypt.compare(password, user.password)
+                .then(result => {
+                    // If comparison fails return an error
+                    if (!result) {
+                        return res.status(422).json({
+                            status: 'ERROR',
+                            message: 'Invalid credentials'
+                        })
+                    }
+
+                    // Otherwise set the session with the user's details
+                    req.session.user = {
+                        id: user.id,
+                        username: user.username
+                    }
+
+                    // Send a response
+                    res.json({
+                        status: 'OK',
+                        message: 'You can now GoMeet other students'
+                    })
+                })
+        })
+})
+
+// Endpoint to destroy the session's data
+app.get('/api/auth/logout', (req, res) => {
+    req.session.destroy()
+
+    res.redirect('/')
+})
+
+
 // Endpoint to register a new user
 app.post('/api/users', (req, res) => {
-    let { username, password } = req.body
+    let {username, password} = req.body
 
     let schema = {
         username: Joi.string().alphanum().required(),
@@ -71,24 +159,24 @@ app.post('/api/users', (req, res) => {
         })
     }
 
-    // Create the new user
+    // Create new user
     db.User.create({
-        username,
-        password
-    })
-    .then(user => {
-        // HTTP 201 = Created
-        res.status(201).json({
-            status: 'OK',
-            message: 'User created!'
+            username,
+            password
         })
-    })
-    .catch(error => {
-        res.status(422).json({
-            status: 'ERROR',
-            message: 'Error creating user!'
+        .then(user => {
+            // HTTP 201 = Created
+            res.status(201).json({
+                status: 'OK',
+                message: 'User created!'
+            })
         })
-    })
+        .catch(error => {
+            res.status(422).json({
+                status: 'ERROR',
+                message: 'Error creating user!'
+            })
+        })
 })
 
 // Endpoint which returns all events relevant to the dormitory
@@ -120,41 +208,73 @@ app.get('/api/events/:id/comments', (req, res) => {
 })
 
 // Endpoint which returns all guests relevant to event
-app.get('/api/guestlist/:id/user', (req, res) => {
+app.get('/api/events/:id/guestlist', (req, res) => {
     let query = {
         where: {
             eventId: req.params.id
         }
     }
-    // SELECT * FROM eventId WHERE UserId = 123
+    // SELECT * FROM eventId WHERE GuestlistId = 123
 
     db.Comment.findAll(query).then(comments => {
         res.json(comments)
     })
 })
 
+// Endpoint to save new comment to an event
+// Requires that user is logged in
+app.post('api/comments', requireAuthentication, (req, res) => {
+    let {
+        text
+    } = req.body
 
-// Main endpoint where main page is served from
-app.get('/', (req, res) => {
-    // Render the main.html in the views folder
-    res.render('main', {
-        title: 'Main page title'
-    })
+    let schema = {
+        text: Joi.string().required()
+    }
+    let result = Joi.validate(req.body, schema)
+
+    if (result.error !== null) {
+        return res.status(422).json({
+            status: 'ERROR',
+            message: 'Missing text for comment'
+        })
+    }
+
+    // Create comment and take the userId from the session
+    // Addid the userId associates the comment to the user
+    db.Comment.create({
+            text,
+            userId: req.session.user.id
+        }, {
+            include: [{
+                model: db.User,
+                attributes: ['username']
+            }]
+        })
+        .then(message => {
+            //Select the messahe again with the associated user
+            return message.reload()
+        })
+        .then(message => {
+            //Emit the newly created message to all sockets
+            io.emit('new message', message)
+
+            // Return a HTTP 201 response
+            return res.status(201).json({
+                status: 'OK',
+                message: 'Comment created'
+            })
+        })
+        .catch(error => {
+            res.status(422).json({
+                status: 'ERROR',
+                message: 'An error occured when creating a comment'
+            })
+        })
 })
 
-// About page
-app.get('/about', (req, res) => {
-    // Example socket.io event
-    io.emit('page view', {
-        page: 'about'
-    })
 
-    // Render the about.html in the views folder
-    res.render('about', {
-        title: 'About page'
-    })
-})
-
+// Create
 // Synchronize database models
 // Documentation: http://docs.sequelizejs.com/
 db.sequelize.sync({
