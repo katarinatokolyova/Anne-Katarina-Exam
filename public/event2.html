@@ -1,69 +1,120 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0/css/bootstrap.min.css">
-  <link rel="stylesheet" href="stylesheet.css">
-  <title>Chat app</title>
-</head>
-<body>
-   <form id="eventdescription">
-    <h1>Summer Party</h1>
-    <p>Come and enjoy the sunshine with your friends and home made coctails.
-        <break></break>
-        The address is: jbkugsfihv
-    </p>
-   </form>
-  <div class="container-fluid">
-    <div class="row main">
-      <div class="col-9" id="chat-window">
-        <!-- Messages here... -->
-      </div>
-      <div class="col-9 hidden" id="guestlist-window">
-        <h3 class="mt-3 ">
-          List of participants: <span class="text-secondary" id="gueslist-window-string"></span>
-        </h3>
-        <hr>
-        <div class="users" id="guestlist-window-results">
-          <!-- Search results -->
+<html>
+<title>About the event</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inconsolata">
+<link rel="stylesheet" href="stylesheet.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0/css/bootstrap.min.css">
+<style>
+body, html {
+    height: 100%;
+    font-family: "Inconsolata", sans-serif;
+}
+.bgimg {
+    background-position: center;
+    background-size: cover;
+    background-image: url("frontpage.jpg");
+    min-height: 75%;
+}
+
+.white-box {
+    background-color: white;
+    color: black;
+}
+.menu {
+    display: none;
+}
+</style>
+<!-- Header with image -->
+<!-- Header with image -->
+<header class="bgimg w3-display-container w3-grayscale-min" id="home">
+        <div class="w3-display-bottomleft w3-center w3-padding-large w3-hide-small">
+          <span class="w3-tag">from 19:00 until 03:00</span>
         </div>
-      </div>
-      <div class="col-3 user-list bg-light">
-        <div class="row">
-          <div class="col">
-            <form id="guestlist-form">
-              <div class="input-group input-group-sm mt-3 mb-1">
-                <input type="text" class="form-control" id="guestlist-input">
-                <div class="input-group-append">
-                  <button class="btn btn-secondary">Participate!</button>
-                </div>
-              </div>
-            </form>
-          </div>
+        <div class="w3-display-middle w3-center">
+          <span class="white-box" style="font-size:90px">Easter Lunch</span>
         </div>
-        <div class="row">
-          <div class="col">
-            <ul class="p-0" id="event-users">
-            </ul>
-          </div>
+        <div class="w3-display-bottomright w3-center w3-padding-large">
+          <span class="w3-text-white">Børglum kollegiet</span>
         </div>
-      </div>
-    </div>
+      </header>
+      
+
+<!-- About Container -->
+<div  id="about">
+  <div>
+    <br>
+    <h2 >Details about the Event</h2>
+    <p>Bring costumes and your friends for the best event of the year</p>
+    <p><strong>Time:</strong> 22:00</p>
+    <p><strong>Address:</strong> 15 Adr street, 5015, NY</p>
+  </div>
+</div>
+
+<!-- Menu Container -->
+<div class="w3-container" id="menu">
+  <div class="w3-content" style="max-width:700px">
+ 
+    <h5 class="w3-center w3-padding-48"><span class="w3-tag w3-wide">Comment on the event</span></h5>
+
     <div class="row commentInput bg-light">
       <div class="col align-self-center">
         <form id="comment-form">
           <div class="input-group">
-            <input type="text" class="form-control" id="eventCommnet" placeholder="Enter comment to the event...">
+            <input type="text" class="form-control" id="eventComment" placeholder="Comment about the event here">
             <div class="input-group-append">
               <button class="btn btn-primary">Comment!</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<!-- Contact/Area Container -->
+<div class="w3-container" id="where" style="padding-bottom:32px;">
+  <div class="w3-content" style="max-width:700px">
+    <h5 class="w3-center w3-padding-48"><span class="w3-tag w3-wide">Do you want to participate?</span></h5>
+    <p>Add yourself to the guestlist</p>
+ 
+  
+    <form id="eventForm">
+      <button type="button" class="btn btn-primary" id="participatebutton" data-toggle="modal" data-target="#exampleModal">Participate</button>
+      </div> 
+<!--
+  </form>
+  <div class="col-3 user-list bg-light">
+    <div class="row">
+      <div class="col">
+        <form id="Guestlist-form">
+          <div class="input-group input-group-sm mt-3 mb-1">
+            <div class="input-group-append">
+                    <button type="button" class="btn btn-primary" id="participatebutton" data-toggle="modal" data-target="#exampleModal">Participate</button>
             </div>
           </div>
         </form>
       </div>
     </div>
+    <div class="row">
+      <div class="col">
+        <ul class="p-0" id="event-users">
+        </ul>
+      </div>
+    </div>
   </div>
+  -->
+
+
+<!-- End page content -->
+</div>
+
+</body>
+</html>
+
+
+
   <!-- Include our javascript code -->
   <script src="/socket.io/socket.io.js"></script>
   <script src="app-with-api.js"></script>

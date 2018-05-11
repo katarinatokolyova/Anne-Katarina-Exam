@@ -15,12 +15,12 @@ sequelize.sync()
 // on User model
 const hashPassword = (user, options) => {
     return bcrypt.hash(user.password, 10)
-    .then(hash => {
-        user.password = hash
-    })
-    .catch(error => {
-        throw new Error(error)
-    })
+        .then(hash => {
+            user.password = hash
+        })
+        .catch(error => {
+            throw new Error(error)
+        })
 }
 
 // Creating an empty object
@@ -28,24 +28,42 @@ const db = {}
 
 //the primary keys (id) is created automatically for each of the tables
 db.User = sequelize.define('user', {
-    username: {type: Sequelize.STRING(20), allowNull: false, unique:true},
-    password: {type: Sequelize.STRING(20),allowNull: false},
+    username: {
+        type: Sequelize.STRING(20),
+        allowNull: false,
+        unique: true
+    },
+    password: {
+        type: Sequelize.STRING(20),
+        allowNull: false
+    },
 })
 
 db.Dormitory = sequelize.define('dormitory', {
-    dormitoryname: {type: Sequelize.STRING(20), allowNull: false},
+    dormitoryname: {
+        type: Sequelize.STRING(20),
+        allowNull: false
+    },
 })
 
 db.Event = sequelize.define('event', {
-    eventname: {type: Sequelize.STRING(20), allowNull: false,},
-    eventDescription: {type: Sequelize.STRING(100),allowNull: false},
+    eventname: {
+        type: Sequelize.STRING(20),
+        allowNull: false,
+    },
+    eventDescription: {
+        type: Sequelize.STRING(100),
+        allowNull: false
+    },
 })
 
 // In-between table
 db.Guestlist = sequelize.define('guestList')
 
 db.Comment = sequelize.define('comment', {
-    comment: {type:Sequelize.STRING(100)},
+    comment: {
+        type: Sequelize.STRING(100)
+    },
 })
 
 // Associtions
@@ -57,8 +75,12 @@ db.Comment.belongsTo(db.User);
 db.Comment.belongsTo(db.Event);
 
 //Connecting the Events and Users through the Gueslist. This will be for the participation list of an event
-db.Event.belongsToMany(db.User, {through: db.Guestlist});
-db.User.belongsToMany(db.Event, {through: db.Guestlist});
+db.Event.belongsToMany(db.User, {
+    through: db.Guestlist
+});
+db.User.belongsToMany(db.Event, {
+    through: db.Guestlist
+});
 
 // Making sure password of the users is hashed
 // when user is created and updated
