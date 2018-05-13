@@ -34,7 +34,7 @@ body, html {
           <span class="w3-tag">from 19:00 until 03:00</span>
         </div>
         <div class="w3-display-middle w3-center">
-          <span class="white-box" style="font-size:90px">Easter Lunch</span>
+          <span class="white-box" style="font-size:90px" id="eventName">Easter Lunch</span>
         </div>
         <div class="w3-display-bottomright w3-center w3-padding-large">
           <span class="w3-text-white">Børglum kollegiet</span>
@@ -47,9 +47,7 @@ body, html {
   <div>
     <br>
     <h2 >Details about the Event</h2>
-    <p>Bring costumes and your friends for the best event of the year</p>
-    <p><strong>Time:</strong> 22:00</p>
-    <p><strong>Address:</strong> 15 Adr street, 5015, NY</p>
+    <p id="eventDescription">Bring costumes and your friends for the best event of the year</p>
   </div>
 </div>
 
@@ -118,5 +116,48 @@ body, html {
   <!-- Include our javascript code -->
   <script src="/socket.io/socket.io.js"></script>
   <script src="app-with-api.js"></script>
+
+  <script>
+
+    var eventInfo = null;
+
+  // TODO: make this finding of dormitryId more serious - ATM it is naive :-)
+  var rawSearch = document.location.search;
+  var params = rawSearch.replace('?','').split('&')
+  var eventId = params[0].split('=')[1];
+  var dormitryId = params[1].split('=')[1];
+
+  // fetch event for a given dormitry
+function fetchEvent(cbReady) {
+
+fetch(`/api/dormitories/${dormitryId}/event/${eventId}`, {})
+          .then(response => response.json())
+          .then(response => {
+            eventInfo = response;
+              cbReady();
+          })
+}
+
+function renderEvent() {
+  const eleEventName = document.querySelector('#eventName');
+  eleEventName.innerText = eventInfo.eventname;
+  const eleEventDescription = document.querySelector('#eventDescription');
+  eleEventDescription.innerText = eventInfo.eventDescription;
+  /*
+  let htmlList = '';
+  eventInfo.map((event, i) => {
+    htmlList+= `<li><a href="event2.html?event=${event.id}&dormitoryId=${event.dormitoryId}" accesskey="${i+1}" style="text-decoration:none">${event.eventname}</a></li>`;
+  });
+  if (htmlList!=='') {
+    eleeventInfo.innerHTML = htmlList;
+  }
+  */
+  console.log(eventInfo);
+}
+
+
+fetchEvent(renderEvent);
+
+</script>
 </body>
 </html>

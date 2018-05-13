@@ -31,11 +31,11 @@
         <div class="modal-body">
           <form id="eventForm">
             <div class="form-group">
-              <label for="recipient-name" class="col-form-label">Event name:</label>
-              <input type="text" class="form-control" id="newEvent">
+              <label for="eventname" class="col-form-label">Event name:</label>
+              <input type="text" class="form-control" id="eventname">
             </div>
             <div class="form-group">
-              <label for="message-text" class="col-form-label">Event description:</label>
+              <label for="eventdescription" class="col-form-label">Event description:</label>
               <textarea class="form-control" id="eventdescription"></textarea>
             </div>
         </div>
@@ -54,18 +54,7 @@
   </p>
   <div id="menu">
     <ul id="eventList">
-      <li>
-        <a href="#" accesskey="1" style="text-decoration:none">Beach Party</a>
-      </li>
-      <li>
-        <a href="#" accesskey="2" style="text-decoration:none">Barbecue</a>
-      </li>
-      <li>
-        <a href="#" accesskey="3" style="text-decoration:none">Coctail Night</a>
-      </li>
-      <li>
-        <a href="#" accesskey="4" style="text-decoration:none">Valentine's day Party</a>
-      </li>
+      <li>No events found...</li>
     </ul>
   </div>
   </div>
@@ -78,6 +67,40 @@
     crossorigin="anonymous"></script>
 
   <script>
+let eventList= null;
+
+// TODO: make this finding of dormitryId more serious - ATM it is naive :-)
+var rawSearch = document.location.search;
+var dormitryId = rawSearch.replace('?','').split('=')[1];
+
+const eleEventList = document.querySelector('#eventList');
+
+// fetch exsisting dorimitories
+function fetchEvents(cbReady) {
+
+  fetch(`/api/dormitories/${dormitryId}/events`, {})
+            .then(response => response.json())
+            .then(response => {
+              eventList = response;
+                cbReady();
+            })
+}
+
+function renderEvents() {
+    let htmlList = '';
+    eventList.map((event, i) => {
+      htmlList+= `<li><a href="event2.html?event=${event.id}&dormitoryId=${event.dormitoryId}" accesskey="${i+1}" style="text-decoration:none">${event.eventname}</a></li>`;
+    });
+    if (htmlList!=='') {
+      eleEventList.innerHTML = htmlList;
+    }
+    
+}
+
+
+fetchEvents(renderEvents);
+
+
     //Modal
     // Select our header on the page, the H1 element
     let pageHeader = document.querySelector('h1')
@@ -94,20 +117,54 @@
     // Next we add a event listener to override default behaviour
     form.addEventListener('submit', function (event) {
       // Make sure not to submit form like usual
-      event.preventDefault()
+      event.preventDefault();
+
+      let eleEventName = document.querySelector('#eventname');
+      let eventName = eleEventName.value;
+      let eleEventDescription = document.querySelector('#eventdescription');
+      let eventDescription = eleEventDescription.value;
+
+      createEvent(eventName, eventDescription);
+
       // Select out input field
-      let inputField = document.querySelector('#newEvent')
+//      let inputField = document.querySelector('#newEvent')
       // Create new <li> element
-      let newListElement = document.createElement('li')
+  //    let newListElement = document.createElement('li')
       // Set the text of the <li> element
-      newListElement.innerHTML = inputField.value
+    //  newListElement.innerHTML = inputField.value
       // Select the list we want to add our new item to
-      let eventList = document.querySelector('#eventList')
+      //let eventList = document.querySelector('#eventList')
       // Add our element to the list
-      eventList.appendChild(newListElement)
+     // eventList.appendChild(newListElement)
       // Delete content of the input field
-      inputField.value = ''
+     // inputField.value = ''
     })
+
+    function createEvent(eventName, eventDescription) {
+            let options = {
+                method: 'post',
+                credentials: 'include',
+                headers: {
+                    'content-type': 'application/json'
+                },
+                body: JSON.stringify({
+                  eventName,
+                  eventDescription
+                })
+            }
+
+            fetch(`/api/dormitory/${dormitryId}/event`, options)
+                .then(response => response.json())
+                .then(response => {
+                  console.log('event response', response);
+                    if (response.status == 'OK') {
+                        document.location.href = './eventlist.html'
+                    } else {
+                        alert(response.message)
+                    }
+                })
+        }
+
   </script>
 </body>
 

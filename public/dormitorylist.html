@@ -31,8 +31,8 @@
         <div class="modal-body">
           <form id="dormitoryForm">
             <div class="form-group">
-              <label for="dormitory-name" class="col-form-label">Dormitory name:</label>
-              <input type="text" class="form-control" id="newDormitory">
+              <label for="dormitoryName" class="col-form-label">Dormitory name:</label>
+              <input type="text" class="form-control" id="dormitoryName">
             </div>
         </div>
         <div class="modal-footer">
@@ -47,18 +47,7 @@
   <h1>LIST OF DORMITORIES</h1>
   <div id="menu">
     <ul id="dormitoryList">
-      <li>
-        <a href="#" accesskey="1" style="text-decoration:none">Christiansbjerg Kollegiet</a>
-      </li>
-      <li>
-        <a href="#" accesskey="2" style="text-decoration:none">Børglum Kollegiet</a>
-      </li>
-      <li>
-        <a href="#" accesskey="3" style="text-decoration:none">Grundtvigs Hus Kollegiet</a>
-      </li>
-      <li>
-        <a href="#" accesskey="4" style="text-decoration:none">Skejbo Kollegiet</a>
-      </li>
+      <li>Please wait...</li>
     </ul>
   </div>
   </div>
@@ -72,6 +61,33 @@
     crossorigin="anonymous"></script>
 
   <script>
+    let dormitoriList= null;
+
+    const eleDormitoryList = document.querySelector('#dormitoryList');
+
+    // Let fetch exsisting dorimitories
+    function fetchDorimitories(cbReady) {
+      // TODO: Make a request to server to get list of Dorimitories
+      fetch('/api/dormitories', {})
+                .then(response => response.json())
+                .then(response => {
+                  dormitoriList = response;
+                    cbReady();
+                })
+    }
+
+    function renderDorimitories() {
+        let htmlList = '';
+        dormitoriList.map((dormitry, i) => {
+          htmlList+= `<li><a href="eventlist.html?dormitry=${dormitry.id}" accesskey="${i+1}" style="text-decoration:none">${dormitry.dormitoryname}</a></li>`;
+        })
+        eleDormitoryList.innerHTML = htmlList;
+    }
+
+
+    fetchDorimitories(renderDorimitories);
+
+
     //Modal
     // Select our header on the page, the H1 element
     let pageHeader = document.querySelector('h1')
@@ -88,20 +104,36 @@
     // Next we add a event listener to override default behaviour
     form.addEventListener('submit', function (dormitory) {
       // Make sure not to submit form like usual
-      dormitory.preventDefault()
+      dormitory.preventDefault();
       // Select out input field
-      let inputField = document.querySelector('#newDormitory')
-      // Create new <li> element
-      let newListElement = document.createElement('li')
-      // Set the text of the <li> element
-      newListElement.innerHTML = inputField.value
-      // Select the list we want to add our new item to
-      let dormitoryList = document.querySelector('#dormitoryList')
-      // Add our element to the list
-      dormitoryList.appendChild(newListElement)
-      // Delete content of the input field
-      inputField.value = ''
+      let eleDormitoryName = document.querySelector('#dormitoryName');
+      let dormitoryName = eleDormitoryName.value;
+
+      createDormitory(dormitoryName);
     })
+
+    function createDormitory(dormitoryName) {
+            let options = {
+                method: 'post',
+                credentials: 'include',
+                headers: {
+                    'content-type': 'application/json'
+                },
+                body: JSON.stringify({
+                  dormitoryName: dormitoryName
+                })
+            }
+
+            fetch('/api/dormitory', options)
+                .then(response => response.json())
+                .then(response => {
+                    if (response.status == 'OK') {
+                        document.location.href = './eventlist.html'
+                    } else {
+                        alert(response.message)
+                    }
+                })
+        }
   </script>
 </body>
 

@@ -2,7 +2,8 @@
 const Sequelize = require('sequelize')
 
 // Pasword hashing function 
-const brypt = require('bcrypt')
+const bcrypt = require('bcrypt')
+
 
 const sequelize = new Sequelize('sqlite:./.data/database.sqlite', {
     logging: console.log
@@ -26,7 +27,6 @@ const hashPassword = (user, options) => {
 // Creating an empty object
 const db = {}
 
-//the primary keys (id) is created automatically for each of the tables
 db.User = sequelize.define('user', {
     username: {
         type: Sequelize.STRING(20),
