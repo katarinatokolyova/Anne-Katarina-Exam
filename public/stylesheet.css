@@ -6,7 +6,7 @@ body {
 body {
 	margin: 0px;
 	padding: 0px;
-	background: linear-gradient(darkgrey, lightgrey);
+	background: linear-gradient(lightgrey, white);
 	font-family: "Verdana", "Geneva", "sans-serif";
 	font-size: 12pt;
 	font-weight: 300;
@@ -41,8 +41,6 @@ p {
 	text-align: center;
 }
 
-strong {}
-
 #header {
 	position: relative;
 	float: center;
@@ -53,8 +51,6 @@ strong {}
 #banner {
 	margin-bottom: 4em;
 }
-
-#menu {}
 
 #menu ul {
 	list-style-type: none;

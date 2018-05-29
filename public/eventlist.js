@@ -43,7 +43,7 @@ let module = {}
 // Method for creating an event
 module.createEvent = function (event) {
     event.push(event)
-    frontend.addComment(event)
+    frontend.addEvent(event)
 }
 
 //Returns an array with events

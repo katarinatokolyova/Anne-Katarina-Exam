@@ -16,9 +16,24 @@
 </head>
 
 <body>
-  <!-- Button trigger modal -->
-  <button type="button" class="btn btn-primary" id="createdormitorybutton" data-toggle="modal" data-target="#exampleModal">Add dormitory</button>
-
+  <!-- Searching within the dormitories -->  
+    <div id="domitorylist-window">
+    <div class="btn btn-primary" id="search-window">
+        <h5 class="modal-title">Search Results: <span class"text-secondary" id="search-window-string"></span>
+        </h5>
+        <hr>
+        <div class="dormitories" id="search-window-results"></div>
+    <form id="search-form">
+        <h5 class="modal-title" id="exampleModalLabel">Search for dormitory</h5>
+        <input type="text" class="form-control" id="search-input" placeholder="Search for dormitories here...">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">Search</button>
+      </form>
+    </div>
+  
+  
+     <!-- Button trigger modal -->
+    <button type="button" class="btn btn-primary" id="createdormitorybutton" data-toggle="modal" data-target="#exampleModal">Add dormitory</button>
+  
   <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
@@ -40,6 +55,7 @@
           <button type="submit" class="btn btn-primary">Add dormitory</button>
         </div>
         </form>
+        
       </div>
     </div>
   </div>

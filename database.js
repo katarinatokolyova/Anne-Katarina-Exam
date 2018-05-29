@@ -4,7 +4,6 @@ const Sequelize = require('sequelize')
 // Pasword hashing function 
 const bcrypt = require('bcrypt')
 
-
 const sequelize = new Sequelize('sqlite:./.data/database.sqlite', {
     logging: console.log
 })

@@ -45,6 +45,8 @@ frontend.addComment = function (comment) {
     let html = commentTemplate(comment)
 
     eventCommentElement.insertAdjacentElement('beforeend', html)
+
+    frontend.autoScroll ()
 }
 
 frontend.addUser = function (user){
@@ -53,7 +55,7 @@ frontend.addUser = function (user){
     guestListElement.insertAdjacentElement('beforeend', html)
     frontend.autoScroll ()
 }
-
+// What is this?
 frontend.getCommentHTML = function (comments) {
     let html = ''
 
@@ -129,7 +131,19 @@ module.getComment = function (event) {
     .then(response => response.json())
 }
 
-// Function which sets ip listeners for Socket.io events 
+//ADDED BY KATKA
+//module.getComments (EVENT_ID)
+module.getComment = function (EVENT_ID) {
+    // The credentials option makes sure that the browsers cookies are sent back and forth during a request
+    let options = {
+        credentials: 'include'
+    }
+    //ADDED BY KATKA
+    return fetch(`/api/events/${event_id}/comments, options`)
+    .then(response => response.json())
+}
+
+// Function which sets up listeners for Socket.io events 
 // And loads initial comments to the commen window
 function initialize() {
     // Setup the socket 
@@ -159,18 +173,20 @@ return module
 function EventComment (text) {
     this.text = text
 }
+
 document.querySelector('#comment-form').addEventListener('submit', event => {
     event.preventDefault()
 
-    let input = document.querySelector('#eventComment')
+    let input = document.querySelector('#EventComment')
 
     let text = input.value
-    let newCommentobject = new EventComment(text)
+    let newCommentObject = new EventComment(text)
 
     Comment.sendComment(newCommentobject)
 
     input.value = ''
 })
+
 
 // Adding user to guestlist of event???? 
 function GuestlistElement (user) {
@@ -187,3 +203,5 @@ document.querySelector('#guestlist-form').addEventListener('submit', event => {
 
     input.value = ''
 })
+
+

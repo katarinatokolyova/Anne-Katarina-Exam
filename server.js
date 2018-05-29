@@ -1,41 +1,90 @@
 // Load Express and create app
 const express = require('express')
+//load Express session
+const session = require('express-session')
+
+// Load bcrypt for password hashing
+// Used to compare password with stored and encrypted password
+const bcrypt = require('bcrypt')
+
+
+// Load Joi module for validation
+const Joi = require('joi')
+
+// Load database
+const db = require('./database.js')
+
+// Make an instance of Express
 const app = express()
 
-// Load express-session and set it up
-// Documentation: https://github.com/expressjs/session
-const session = require('express-session')
-app.use(session({
-    secret: 'audl2018'
-}))
-
 // Enable JSON support
+// Handle Json request
 // Documentation: https://expressjs.com/en/api.html#express.json
 app.use(express.json())
 
+//Set up express-session
+const expressSession = session({
+    secret: 'audl2018'
+})
+
+// Set up templates (NYT)
+// Documentation: https://expressjs.com/en/api.html#app.engine
+app.engine('html', require('ejs').renderFile)
+app.set('view engine', 'html')
+
+// Load express-session and set it up
+// Documentation: https://github.com/expressjs/session
+
+// Use the above settings
+app.use(expressSession)
+
+// Load Socket.io to support real-time features
+const server = require('http').Server(app)
+const io = require('socket.io')(server)
+// Share sessions between Express and Socket.io
+const ioSession = require('express-socket.io-session')
+// Setup session sharing between Express and Socket.io
+io.use(ioSession(expressSession, {
+    autoSave: true
+}))
 // Set up templates
 // Documentation: https://expressjs.com/en/api.html#app.engine
 app.engine('html', require('ejs').renderFile)
 app.set('view engine', 'html')
 
-// Serve static files
+// Serve static files/serve public folder
 // Documentation: https://expressjs.com/en/starter/static-files.html
 app.use(express.static('public'))
+
 
 // Load Socket.io and set it up
 // Documentation: https://socket.io/get-started/chat/
 const http = require('http').Server(app)
-const io = require('socket.io')(http)
 
-// Real time events
+
+// Stuff to do when a user (socket) connects to the site
 io.on('connection', socket => {
     console.log('Socket connected', socket.id)
 
     socket.emit('debug message', 'Socket connected to server!')
+    // Take the user object from the session
+    // It contains the user's ID and username
+    let {
+        user
+    } = socket.handshake.session
 })
 
-// Load database
-const db = require('./database.js')
+// Authentication middleware
+const requireAuthentication = (req, res, next) => {
+    if (!req.session.user) {
+        return res.json({
+            status: 'ERROR',
+            message: 'Authentication required!'
+        })
+    }
+
+    next()
+}
 
 //TESTING THE DATABASE
 app.get('/test', (req, res) => {
@@ -47,10 +96,34 @@ app.get('/test', (req, res) => {
         })
 })
 
+// Create new dormitry
+app.post('/api/dormitory', (req, res) => {
+    let {
+        dormitoryName
+    } = req.body;
+
+    db.Dormitory.create({
+            dormitoryname: dormitoryName
+        })
+        .then(dorm => {
+            res.json(dorm)
+        })
+})
+
+// Return a list of dormitories
 app.get('/api/dormitories', (req, res) => {
-    db.Dormitory.findAll().then(dormitories => {
-        res.json(dormitories)
-    })
+    db.Dormitory.findAll()
+        .then(dormitories => {
+            console.log("Returning this JSON: ", dormitories);
+            res.json(dormitories);
+        })
+        .error(error => {
+            console.log(error);
+            res.status(422).json({
+                status: 'ERROR',
+                message: 'Could not retrieve list of dormitories'
+            })
+        })
 })
 
 // Manually check if user is logged in - if not, redirect to login.html
@@ -66,7 +139,7 @@ app.get('/', (req, res) => {
 // Manually check if user is registered - if not, redirect to register page - how to do this???
 
 // Endpoint to handle user authentication
-app.post('api/auth', (req, res) => {
+app.post('/api/auth', (req, res) => {
     let {
         username,
         password
@@ -87,6 +160,7 @@ app.post('api/auth', (req, res) => {
             message: 'Invalid request'
         })
     }
+
 
     // Build query for looking up the user
     let query = {
@@ -143,7 +217,10 @@ app.get('/api/auth/logout', (req, res) => {
 
 // Endpoint to register a new user
 app.post('/api/users', (req, res) => {
-    let {username, password} = req.body
+    let {
+        username,
+        password
+    } = req.body
 
     let schema = {
         username: Joi.string().alphanum().required(),
@@ -193,6 +270,40 @@ app.get('/api/dormitories/:id/events', (req, res) => {
     })
 })
 
+// Endpoint which returns a event relevant to the dormitory
+app.get('/api/dormitories/:dormitoryId/event/:eventid', (req, res) => {
+    let query = {
+        where: {
+            dormitoryId: req.params.dormitoryId,
+            id: req.params.eventid
+        }
+    }
+    // SELECT * FROM events WHERE dormitoryId = 123 AND id = 1
+
+    db.Event.findOne(query).then(events => {
+        res.json(events)
+    })
+})
+
+// Create event for a given dormitry :id
+app.post('/api/dormitory/:id/event', (req, res) => {
+    let {
+        eventName,
+        eventDescription
+    } = req.body;
+    let dormitoryId = req.params.id;
+
+    // TODO: Hvordan ved vi at det nye event tilhører et bestemt kollegie?
+    db.Event.create({
+            dormitoryId,
+            eventname: eventName,
+            eventDescription: eventDescription
+        })
+        .then(dorm => {
+            res.json(dorm)
+        })
+})
+
 // Endpoint which returns all comments relevant to the event
 app.get('/api/events/:id/comments', (req, res) => {
     let query = {
@@ -223,7 +334,7 @@ app.get('/api/events/:id/guestlist', (req, res) => {
 
 // Endpoint to save new comment to an event
 // Requires that user is logged in
-app.post('api/comments', requireAuthentication, (req, res) => {
+app.post('/api/events/:eventid/comment', requireAuthentication, (req, res) => {
     let {
         text
     } = req.body
@@ -303,11 +414,8 @@ app.get('/giphy', (req, res) => {
         })
 })
 
-app.listen(3000, () => {
-    console.log('Server started')
-})
-
-//gif search
+/*
+gif search
 client.trending("gifs", {})
     .then((response) => {
 
@@ -315,3 +423,4 @@ client.trending("gifs", {})
     .catch((err) = {
 
     })
+*/
