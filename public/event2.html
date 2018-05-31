@@ -156,6 +156,8 @@
 
       fetchEvent(renderEvent);
 
+      getCommentsForEvent(renderComments);
+
       // fetch comment for a given event
       function fetchComment(cbReady) {
 
@@ -163,17 +165,20 @@
           .then(response => response.json())
           .then(response => {
             commentInfo = response;
-            cbReady();
+            cbReady(commentInfo);
           })
       }
 
-      function renderComment() {
+      function renderComment(commentInfo) {
         const eleEventComment = document.querySelector('#eventComment');
+        console.log('commentInfo: ', commentInfo);
+
         eleEventComment.innerText = eventInfo.eventComment;
 
         console.log(commentInfo);
       }
 
+fetchComment(renderComment);
       //ADDED BY KATKA
       //Modal
       // Add comment to our event
@@ -216,7 +221,7 @@
           })
       }
 
-    function getCommentsForEvent(text) {
+    function getCommentsForEvent(renderEventsCb) {
         let options = {
           method: 'get',
           credentials: 'include',
@@ -228,8 +233,14 @@
         fetch(`/api/events/${eventId}/comments?id=${eventId}`, options)
           .then(response => response.json())
           .then(response => {
+            // comment er ændret til text
             console.log('comments ', response)
+            renderEventsCb(response)
           })
+      }
+
+      function renderComments(response) {
+
       }
 
 

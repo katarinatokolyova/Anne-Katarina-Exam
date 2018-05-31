@@ -114,7 +114,7 @@ app.post('/api/dormitory', (req, res) => {
 app.get('/api/dormitories', (req, res) => {
     db.Dormitory.findAll()
         .then(dormitories => {
-            console.log("Returning this JSON: ", dormitories);
+            //console.log("Returning this JSON: ", dormitories);
             res.json(dormitories);
         })
         .error(error => {
@@ -270,6 +270,35 @@ app.get('/api/dormitories/:id/events', (req, res) => {
     })
 })
 
+// Endpoint which returns all events relevant to the dormitory
+app.put('/api/dormitories/:id/events', (req, res) => {
+    let query = {
+        where: {
+            dormitoryId: req.params.id
+        }
+    }
+    // SELECT * FROM events WHERE dormitoryId = 123
+
+    db.Event.findAll(query).then(events => {
+        res.json(events)
+    })
+})
+
+//Endpoint which deletes an event
+app.delete('/api/events/:id', (req, res) => {
+    let {
+        eventName,
+        eventDescription
+    } = req.body;
+    let dormitoryId = req.params.id;
+
+    //delete
+    const index = events.indexOf(event);
+    events.splite(index, 1);
+    
+    res.send(event);
+})
+
 // Endpoint which returns a event relevant to the dormitory
 app.get('/api/dormitories/:dormitoryId/event/:eventid', (req, res) => {
     let query = {
@@ -308,7 +337,7 @@ app.post('/api/dormitory/:id/event', (req, res) => {
 app.get('/api/events/:id/comments', (req, res) => {
     let query = {
         where: {
-            eventId: req.params.id
+        eventId: req.params.id
         }
     }
     // SELECT * FROM comments WHERE eventId = 123
@@ -332,12 +361,15 @@ app.get('/api/events/:id/guestlist', (req, res) => {
     })
 })
 
+
+
 // Endpoint to save new comment to an event
 // Requires that user is logged in
-app.post('/api/events/:eventid/comment', requireAuthentication, (req, res) => {
+app.post('/api/events/:id/comment', requireAuthentication, (req, res) => {
     let {
         text
     } = req.body
+
 
     let schema = {
         text: Joi.string().required()
@@ -354,34 +386,35 @@ app.post('/api/events/:eventid/comment', requireAuthentication, (req, res) => {
     // Create comment and take the userId from the session
     // Addid the userId associates the comment to the user
     db.Comment.create({
-            text,
-            userId: req.session.user.id
-        }, {
-            include: [{
-                model: db.User,
-                attributes: ['username']
-            }]
-        })
-        .then(message => {
-            //Select the messahe again with the associated user
-            return message.reload()
-        })
-        .then(message => {
-            //Emit the newly created message to all sockets
-            io.emit('new message', message)
+        text,
+        userId: req.session.user.id,
+        eventId: req.params.id
+    }, {
+        include: [{
+            model: db.User,
+            attributes: ['username']
+        }]
+    })
+    .then(comment => {
+        //Select the messahe again with the associated user
+        return comment.reload()
+    })
+    .then(comment => {
+        //Emit the newly created message to all sockets
+        io.emit('new comment', comment)
 
-            // Return a HTTP 201 response
-            return res.status(201).json({
-                status: 'OK',
-                message: 'Comment created'
-            })
+        // Return a HTTP 201 response
+        return res.status(201).json({
+            status: 'OK',
+            message: 'Comment created'
         })
-        .catch(error => {
-            res.status(422).json({
-                status: 'ERROR',
-                message: 'An error occured when creating a comment'
-            })
+    })
+    .catch(error => {
+        res.status(422).json({
+            status: 'ERROR',
+            message: 'An error occured when creating a comment'
         })
+    })
 })
 
 

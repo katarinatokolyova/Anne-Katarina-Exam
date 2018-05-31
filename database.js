@@ -8,6 +8,7 @@ const sequelize = new Sequelize('sqlite:./.data/database.sqlite', {
     logging: console.log
 })
 
+
 //Intitializing models in database
 sequelize.sync()
 
